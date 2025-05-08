@@ -50,30 +50,37 @@
                 @forelse ($filteredDrinks as $drink)
                     <div class="col">
                         <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden position-relative">
+                            {{-- Картинка + кнопка "Конструктор" при наведении --}}
                             <div class="position-relative">
                                 <img src="{{ asset('images/' . $drink->image_url) }}"
                                      class="card-img-top"
                                      style="height: 200px; object-fit: cover;"
                                      alt="{{ $drink->name }}">
 
-                                <form action="{{ route('order.add') }}" method="POST"
-                                      class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center overlay-form">
-                                    @csrf
-                                    <input type="hidden" name="drink_id" value="{{ $drink->id }}">
-                                    <button type="submit" class="btn btn-outline-light px-4 py-2 shadow">Добавить</button>
-                                </form>
+                                <a href="{{ route('drink', $drink->id) }}"
+                                   class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center overlay-form text-decoration-none">
+                                    <span class="btn btn-outline-light px-4 py-2 shadow">Изменить</span>
+                                </a>
                             </div>
 
                             <div class="card-body d-flex flex-column justify-content-between">
-                                <h5 class="card-title mb-1">{{ $drink->name }}</h5>
-                                <span class="badge bg-light text-muted mb-2">{{ $drink->category }}</span>
-                                <p class="card-text small mb-2">
-                                    @foreach ($drink->ingredients as $ing)
-                                        {{ $ing->name }} — {{ $ing->pivot->amount }}<br>
-                                    @endforeach
-                                </p>
-                                <p class="fw-bold text-success">Цена: {{ $drink->price }} ₽</p>
-                                <a href="{{ route('drink', $drink->id) }}" class="btn btn-outline-secondary btn-sm mt-2">Конструктор</a>
+                                <div>
+                                    <h5 class="card-title mb-1">{{ $drink->name }}</h5>
+                                    <span class="badge bg-light text-muted mb-2">{{ $drink->category }}</span>
+                                    <p class="card-text small mb-2">
+                                        @foreach ($drink->ingredients as $ing)
+                                            {{ $ing->name }} — {{ $ing->pivot->amount }}<br>
+                                        @endforeach
+                                    </p>
+                                    <p class="fw-bold text-success">Цена: {{ $drink->price }} ₽</p>
+                                </div>
+
+                                {{-- Кнопка "Добавить в заказ" внизу --}}
+                                <form action="{{ route('order.add') }}" method="POST" class="mt-2">
+                                    @csrf
+                                    <input type="hidden" name="drink_id" value="{{ $drink->id }}">
+                                    <button type="submit" class="btn btn-outline-dark w-100"> Добавить в заказ</button>
+                                </form>
                             </div>
                         </div>
                     </div>
