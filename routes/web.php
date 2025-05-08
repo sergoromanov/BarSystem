@@ -28,5 +28,10 @@ Route::get('/favorites/{id}/edit', [\App\Http\Controllers\FavoriteController::cl
 // Обработка обновления
 Route::post('/favorites/{id}', [\App\Http\Controllers\FavoriteController::class, 'update'])->name('favorites.update');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::delete('/favorites/{id}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+Route::delete('/favorites/{id}', [FavoriteController::class, 'destroy'])->name('favorites.delete');
+
 Route::post('/order/{id}/pay', [\App\Http\Controllers\OrderController::class, 'pay'])->name('order.pay');
+Route::post('/order/{id}/pay/start', [OrderController::class, 'startPayment'])->name('order.pay.start');
+Route::get('/payment/fake/{id}', [OrderController::class, 'showFakePayment'])->name('payment.fake');
+Route::post('/payment/fake/{id}/confirm', [OrderController::class, 'confirmFakePayment'])->name('payment.fake.confirm');
+

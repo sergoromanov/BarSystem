@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Бар')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    @stack('styles')
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="{{ route('catalog') }}">ParaBokalov</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{{ route('catalog') }}">ParaBokalov</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -19,8 +20,23 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('catalog') ? 'active' : '' }}" href="{{ route('catalog') }}">Каталог</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('order') ? 'active' : '' }}" href="{{ route('order') }}">Заказ</a>
+                @php
+                    $unpaidCount = 0;
+                    if (session('user_id')) {
+                        $user = \App\Models\User::find(session('user_id'));
+                        $unpaidCount = $user?->orders()->where('payment_status', '!=', 'paid')->count() ?? 0;
+                    }
+                @endphp
+
+                <li class="nav-item position-relative">
+                    <a class="nav-link {{ request()->routeIs('order') ? 'active' : '' }}" href="{{ route('order') }}">
+                        Заказ
+                        @if ($unpaidCount > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ $unpaidCount }}
+            </span>
+                        @endif
+                    </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('favorites') ? 'active' : '' }}" href="{{ route('favorites') }}">Мои рецепты</a>
@@ -32,25 +48,28 @@
                 @php
                     $user = \App\Models\User::find(session('user_id'));
                 @endphp
+
                 @if ($user)
-                    <span class="navbar-text text-white me-3">
-            {{ $user->phone }} | Бонусы: {{ $user->bonus }}
-        </span>
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                        @csrf
-                        <button class="btn btn-outline-light btn-sm">Выход</button>
-                    </form>
+                    <div class="d-flex align-items-center gap-3 text-white">
+                        <div class="text-end small">
+                            <div><strong>{{ $user->phone }}</strong></div>
+                            <div>Бонусы: <span class="badge bg-success">{{ $user->bonus }}</span></div>
+                        </div>
+
+                        <form action="{{ route('logout') }}" method="GET">
+                            <button class="btn btn-sm btn-outline-light">Выход</button>
+                        </form>
+                    </div>
                 @endif
             @endif
         </div>
     </div>
 </nav>
 
-<div class="container">
+<div class="container py-4">
     @yield('content')
 </div>
 
-{{-- Bootstrap JS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

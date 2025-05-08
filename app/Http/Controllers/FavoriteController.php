@@ -51,10 +51,11 @@ class FavoriteController extends Controller
     }
     public function destroy($id)
     {
-        $favorite = \App\Models\Favorite::where('id', $id)->where('user_id', session('user_id'))->firstOrFail();
+        $favorite = Favorite::where('id', $id)->where('user_id', session('user_id'))->firstOrFail();
         $favorite->delete();
 
         return redirect()->route('favorites')->with('success', 'Рецепт удалён.');
     }
+
 
 }

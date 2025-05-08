@@ -138,5 +138,43 @@ class OrderController extends Controller
 
         return redirect()->route('order')->with('success', 'Заказ оплачен!');
     }
+    public function startPayment($id)
+    {
+        $userId = session('user_id');
+        $order = Order::where('id', $id)->where('user_id', $userId)->firstOrFail();
+
+        $order->update([
+            'payment_status' => 'pending',
+            'payment_id' => 'fake_' . uniqid(),
+        ]);
+
+        return redirect()->route('payment.fake', $order->id);
+    }
+    public function showFakePayment($id)
+    {
+        $userId = session('user_id');
+        $order = Order::where('id', $id)->where('user_id', $userId)->firstOrFail();
+
+        return view('payment.fake', compact('order'));
+    }
+    public function confirmFakePayment($id)
+    {
+        $userId = session('user_id');
+        $order = Order::where('id', $id)->where('user_id', $userId)->firstOrFail();
+
+        $order->update([
+            'payment_status' => 'paid',
+            'paid_at' => now(),
+            'is_paid' => true,
+        ]);
+
+        return redirect()->route('order')->with('success', 'Оплата прошла успешно (имитация).');
+    }
+
+
+
+
+
+
 
 }
