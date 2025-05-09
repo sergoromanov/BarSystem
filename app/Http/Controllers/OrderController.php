@@ -86,7 +86,10 @@ class OrderController extends Controller
                 'ingredients' => $ingredientData,
             ]);
 
-            return back()->with('success', 'Рецепт сохранён в избранное!');
+            return redirect()
+                ->route('drink', $drink->id)
+                ->withInput()
+                ->with('success', 'Рецепт сохранён в избранное!');
         }
 
         foreach ($ingredientIds as $ingredientId) {

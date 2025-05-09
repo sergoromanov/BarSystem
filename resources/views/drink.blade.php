@@ -3,6 +3,9 @@
 @section('title', 'Конструктор — ' . $drink->name)
 
 @section('content')
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
     <h2 class="mb-4">Конструктор напитка: {{ $drink->name }}</h2>
 
     <form action="{{ route('drink.customOrder', $drink->id) }}" method="POST">
@@ -21,9 +24,15 @@
                 <div class="row g-3">
                     @foreach ($allIngredients as $ingredient)
                         @php
+                            // старые значения
+                            $oldIngredients = old('ingredients', []);
+                            $oldAmounts = old('amounts.' . $ingredient->id);
+
+                            // из связанной модели (если есть)
                             $pivot = $drink->ingredients->firstWhere('id', $ingredient->id)?->pivot;
-                            $amountValue = preg_replace('/[^\d]/', '', $pivot?->amount ?? '');
-                            $selected = $amountValue ? 'selected' : '';
+                            $amountValue = $oldAmounts ?? preg_replace('/[^\d]/', '', $pivot?->amount ?? '');
+
+                            $selected = in_array($ingredient->id, $oldIngredients) || $amountValue ? 'selected' : '';
                         @endphp
 
                         <div class="col-12 col-md-6 col-xl-4">
@@ -49,6 +58,7 @@
                                 </div>
                             </div>
                         </div>
+
                     @endforeach
                 </div>
             </div>
