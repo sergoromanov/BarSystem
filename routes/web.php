@@ -16,11 +16,8 @@ use App\Http\Controllers\BarmanController;
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog');
 Route::get('/drink/{id}', [CatalogController::class, 'show'])->name('drink');
 Route::get('/', function () {
-    return redirect()->route('home');
+    return redirect()->route('auth.login');
 });
-
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('doLogin');
 
 Route::get('/order', [OrderController::class, 'index'])->name('order');
 Route::post('/order/add', [OrderController::class, 'add'])->name('order.add');
