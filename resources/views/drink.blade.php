@@ -17,21 +17,17 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0">Выберите ингредиенты:</h5>
                     <button type="button" class="btn btn-sm btn-outline-secondary" id="clear-selection">
-                         Очистить выбор
+                        Очистить выбор
                     </button>
                 </div>
 
                 <div class="row g-3">
-                    @foreach ($allIngredients as $ingredient)
+                    @forelse ($allIngredients as $ingredient)
                         @php
-                            // старые значения
                             $oldIngredients = old('ingredients', []);
                             $oldAmounts = old('amounts.' . $ingredient->id);
-
-                            // из связанной модели (если есть)
                             $pivot = $drink->ingredients->firstWhere('id', $ingredient->id)?->pivot;
                             $amountValue = $oldAmounts ?? preg_replace('/[^\d]/', '', $pivot?->amount ?? '');
-
                             $selected = in_array($ingredient->id, $oldIngredients) || $amountValue ? 'selected' : '';
                         @endphp
 
@@ -52,14 +48,19 @@
                                            placeholder="0"
                                            inputmode="numeric"
                                            pattern="\d*"
-                                            {{ $selected ? '' : 'readonly' }}>
+                                        {{ $selected ? '' : 'readonly' }}>
                                     <span class="input-group-text">мл</span>
                                     <button type="button" class="btn btn-outline-secondary btn-increase" data-id="{{ $ingredient->id }}">+</button>
                                 </div>
                             </div>
                         </div>
-
-                    @endforeach
+                    @empty
+                        <div class="col-12">
+                            <div class="alert alert-warning text-center">
+                                Ингредиенты для этого напитка временно недоступны.
+                            </div>
+                        </div>
+                    @endforelse
                 </div>
             </div>
 
@@ -73,13 +74,19 @@
             </div>
         </div>
 
-        <div class="mt-4">
-            <button type="submit" class="btn btn-primary">Заказать с выбранным составом</button>
-            <button type="submit" name="save_favorite" value="1" class="btn btn-outline-warning ms-2">
-                Сохранить в избранное
-            </button>
-            <a href="{{ route('catalog') }}" class="btn btn-outline-secondary ms-2">Назад в каталог</a>
-        </div>
+        @if($allIngredients->count())
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Заказать с выбранным составом</button>
+                <button type="submit" name="save_favorite" value="1" class="btn btn-outline-warning ms-2">
+                    Сохранить в избранное
+                </button>
+                <a href="{{ route('catalog') }}" class="btn btn-outline-secondary ms-2">Назад в каталог</a>
+            </div>
+        @else
+            <div class="mt-4">
+                <a href="{{ route('catalog') }}" class="btn btn-outline-secondary">← Назад в каталог</a>
+            </div>
+        @endif
     </form>
 
     @push('styles')
@@ -96,7 +103,6 @@
                 color: #fff;
                 background-color: transparent;
             }
-
             .glass-container {
                 width: 100%;
                 max-width: 140px;
@@ -111,7 +117,6 @@
                 border: 2px solid #e0e0e0;
                 position: relative;
             }
-
             .ingredient-layer {
                 width: 100%;
                 text-align: center;
@@ -126,7 +131,6 @@
                 justify-content: center;
                 position: relative;
             }
-
             .ingredient-layer::after {
                 content: attr(data-tooltip);
                 position: absolute;
@@ -138,12 +142,10 @@
                 opacity: 0;
                 transition: opacity 0.3s ease;
             }
-
             .ingredient-layer:hover::after {
                 opacity: 1;
                 background-color: rgba(0,0,0,0.4);
             }
-
             @keyframes pour {
                 from {
                     transform: scaleY(0);
@@ -154,7 +156,6 @@
                     opacity: 1;
                 }
             }
-
             #total-volume.text-danger {
                 color: #dc3545;
                 font-weight: bold;
@@ -173,7 +174,6 @@
                 const id = card.dataset.id;
                 const name = card.querySelector('.fw-bold').textContent;
                 const amount = parseInt(document.getElementById('amount_' + id).value) || 0;
-
                 total += amount;
 
                 const heightPercent = Math.min((amount / 300) * 100, 100);
@@ -260,6 +260,6 @@
             updateSelectedList();
         });
 
-        updateSelectedList(); // первичная инициализация
+        updateSelectedList();
     </script>
 @endsection

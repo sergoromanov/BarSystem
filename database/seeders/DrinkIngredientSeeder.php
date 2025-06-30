@@ -30,5 +30,35 @@ class DrinkIngredientSeeder extends Seeder
         $wine->ingredients()->attach([
             Ingredient::where('name', 'Виноград')->first()->id => ['amount' => '150 мл'],
         ]);
+        $latte = Drink::where('name', 'Латте')->first();
+        $latte->ingredients()->attach([
+            Ingredient::where('name', 'Кофе')->first()->id => ['amount' => '50 мл'],
+            Ingredient::where('name', 'Молоко')->first()->id => ['amount' => '150 мл'],
+            Ingredient::where('name', 'Сахар')->first()->id => ['amount' => '10 г'],
+        ]);
+
+        $negroni = Drink::where('name', 'Негрони')->first();
+        $negroni->ingredients()->attach([
+            Ingredient::where('name', 'Джин')->first()->id => ['amount' => '30 мл'],
+            Ingredient::where('name', 'Кампари')->first()->id => ['amount' => '30 мл'],
+            Ingredient::where('name', 'Красный вермут')->first()->id => ['amount' => '30 мл'],
+        ]);
+
+        $irish = Drink::where('name', 'Айриш Кофе')->first();
+        $irish->ingredients()->attach([
+            Ingredient::where('name', 'Кофе')->first()->id => ['amount' => '80 мл'],
+            Ingredient::where('name', 'Виски')->first()->id => ['amount' => '40 мл'],
+            Ingredient::where('name', 'Взбитые сливки')->first()->id => ['amount' => '30 мл'],
+        ]);
+
+        $shardonnay = Drink::where('name', 'Шардоне')->first();
+        $shardonnay->ingredients()->attach([
+            Ingredient::where('name', 'Виноград')->first()->id => ['amount' => '150 мл'],
+        ]);
+
+        $espresso = Drink::where('name', 'Эспрессо')->first();
+        $espresso->ingredients()->attach([
+            Ingredient::where('name', 'Кофе')->first()->id => ['amount' => '50 мл'],
+        ]);
     }
 }

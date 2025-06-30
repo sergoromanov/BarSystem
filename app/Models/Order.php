@@ -8,7 +8,7 @@ class Order extends Model
 {
     public $timestamps = false;
 
-    protected $fillable = ['user_id', 'created_at', 'is_paid', 'payment_status', 'payment_id', 'paid_at'];
+    protected $fillable = ['user_id', 'created_at', 'is_paid', 'payment_status', 'payment_id', 'paid_at', 'status'];
 
 
 

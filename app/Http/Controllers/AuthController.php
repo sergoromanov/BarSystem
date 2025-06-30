@@ -17,27 +17,10 @@ class AuthController extends Controller
     {
         $phone = $request->phone;
 
-        // Разрешаем номер 0000 для администратора
-        if ($phone !== '0000') {
-            $request->validate([
-                'phone' => 'required|string|min:10|max:20'
-            ]);
-        }
-
-        // Генерация 4-значного кода
-        $code = rand(1000, 9999);
-
-        // Сохраняем код
-        \App\Models\LoginCode::create([
-            'phone' => $phone,
-            'code' => $code,
-        ]);
-
-        // Проверка на админский пароль
-        if ($phone === '0000' && $request->filled('admin_password')) {
+        // Вход как админ
+        if ($phone === env('ADMIN_PHONE') && $request->filled('admin_password')) {
             if ($request->admin_password === env('ADMIN_PASSWORD')) {
-                // Админ успешно вошёл
-                $user = \App\Models\User::firstOrCreate(['phone' => $phone], ['bonus' => 0]);
+                $user = User::firstOrCreate(['phone' => $phone], ['bonus' => 0]);
                 $user->is_admin = true;
                 $user->save();
 
@@ -52,21 +35,52 @@ class AuthController extends Controller
             }
         }
 
-        // Лог для отладки
-        logger("Код $code отправлен на $phone");
+        // Вход как бармен
+        if ($phone === env('BARMAN_PHONE') && $request->filled('barman_password')) {
+            if ($request->barman_password === env('BARMAN_PASSWORD')) {
+                $user = User::firstOrCreate(['phone' => $phone], ['bonus' => 0]);
+                $user->is_barman = true;
+                $user->save();
 
-        // В режиме разработки — показать код сразу
+                session([
+                    'user_id' => $user->id,
+                    'user_phone' => $user->phone,
+                ]);
+
+                return redirect()->route('barman.dashboard');
+            } else {
+                return back()->withErrors(['barman_password' => 'Неверный пароль бармена'])->withInput();
+            }
+        }
+
+        // Валидация обычного телефона
+        if (!in_array($phone, [env('ADMIN_PHONE'), env('BARMAN_PHONE')])) {
+            $request->validate([
+                'phone' => 'required|string|min:10|max:20'
+            ]);
+        }
+
+        // Генерация 4-значного кода
+        $code = rand(1000, 9999);
+
+        // Сохраняем код
+        LoginCode::create([
+            'phone' => $phone,
+            'code' => $code,
+        ]);
+
+        session(['phone' => $phone]);
+
         if (app()->environment('local')) {
-            session(['phone' => $phone]);
             return view('auth.verify', [
                 'phone' => $phone,
                 'code' => $code
             ]);
         }
 
-        // Переход на ввод кода
         return redirect()->route('auth.verify')->with('phone', $phone);
     }
+
 
 
     public function showVerificationForm()
