@@ -45,6 +45,7 @@ Route::post('/order/{id}/pay/start', [OrderController::class, 'startPayment'])->
 Route::get('/payment/fake/{id}', [OrderController::class, 'showFakePayment'])->name('payment.fake');
 Route::post('/payment/fake/{id}/confirm', [OrderController::class, 'confirmFakePayment'])->name('payment.fake.confirm');
 
+
 // 🔹 Избранное
 Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites');
 Route::get('/favorites/{id}/edit', [FavoriteController::class, 'edit'])->name('favorites.edit');
